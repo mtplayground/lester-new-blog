@@ -1,0 +1,46 @@
+---
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  date: Date;
+  tags: string[];
+}
+
+const { title, description, date, tags } = Astro.props;
+
+const publishedOn = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: '2-digit',
+}).format(date);
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="mx-auto max-w-3xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <header class="space-y-4 border-b border-slate-200 pb-6">
+      <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">{title}</h1>
+      <p class="text-sm text-slate-500">
+        <time datetime={date.toISOString()}>{publishedOn}</time>
+      </p>
+      {
+        tags.length > 0 && (
+          <ul class="flex flex-wrap gap-2" aria-label="Post tags">
+            {tags.map((tag) => (
+              <li>
+                <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                  #{tag}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    <div class="prose prose-slate mt-8 max-w-none leading-relaxed">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
