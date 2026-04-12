@@ -1,0 +1,92 @@
+Architecture Plan: Astro Blog (Issues #1-#15)
+
+1) Module Structure and File Organization
+
+Root
+- `astro.config.mjs`: Astro integrations (`tailwind`, `sitemap`) and `site` URL.
+- `package.json`: scripts, Astro/Tailwind/integration dependencies.
+- `tsconfig.json`: strict TS config (Astro base + project overrides).
+- `tailwind.config.mjs`: content globs, dark mode strategy, typography plugin.
+- `Dockerfile`, `nginx.conf`, `fly.toml`, `.dockerignore`, `.env.example`: deployment/runtime.
+
+Content Layer
+- `src/content/config.ts`: content collection schema for `blog`.
+- `src/content/blog/*.md`: markdown posts with frontmatter.
+
+UI Layer
+- `src/layouts/BaseLayout.astro`: global HTML shell, header/footer, theme boot script, SEO usage.
+- `src/layouts/PostLayout.astro`: article-specific layout + prose container.
+- `src/components/Header.astro`: primary nav, RSS link, theme toggle.
+- `src/components/Footer.astro`: site footer.
+- `src/components/SEO.astro`: title/description/canonical/OG tags.
+- `src/components/PostCard.astro`: reusable post list card.
+- `src/components/ThemeToggle.astro`: UI + client script hook.
+
+Pages Layer
+- `src/pages/index.astro`: home feed listing posts.
+- `src/pages/about.astro`: static about page.
+- `src/pages/blog/[...slug].astro`: post detail pages via `getStaticPaths`.
+- `src/pages/tags/index.astro`: all tags + counts.
+- `src/pages/tags/[tag].astro`: per-tag post lists.
+- `src/pages/rss.xml.ts`: RSS endpoint from published posts.
+
+Optional utility module (recommended for reuse from issues #4/#6/#7/#10)
+- `src/lib/content.ts`:
+  - `getPublishedPosts()` (filters drafts)
+  - `sortPostsByDateDesc(posts)`
+  - `collectTagCounts(posts)`
+  - `slugifyTag(tag)` / `normalizeTag(tag)`
+
+2) Shared Types
+
+- Frontmatter shape should be centralized via content collection schema:
+  - `title: string`
+  - `description: string`
+  - `date: Date`
+  - `tags: string[]` (default `[]`)
+  - `draft: boolean` (default `false`)
+- `PostListItem` derived type for cards/lists: `{ slug, title, description, date, tags }`.
+- `TagCount` type: `{ tag: string, count: number, href: string }`.
+- `SEOProps` for `SEO.astro`: `title`, `description?`, `canonical?`, `ogImage?`, `type?`.
+
+3) Dependency Map Across Issues
+
+Foundation
+- #1 Initialize Astro + TS + Tailwind (base prerequisite).
+- #2 Base structure + layout shell depends on #1.
+- #3 Content collections depends on #1.
+
+Core blog experience
+- #4 Home listing depends on #2 + #3.
+- #5 Dynamic post pages depends on #2 + #3.
+- #6 Tag index depends on post-querying capability from #4/#5.
+- #7 Individual tag pages depends on #6.
+
+Cross-cutting site features
+- #8 Dark mode depends on #2 (header/layout).
+- #9 SEO component depends on #2 (BaseLayout integration).
+- #10 RSS depends on content querying from #3/#4 and header from #2.
+- #11 Sitemap depends on #1 (astro config/site URL).
+- #12 About page depends on #2.
+- #13 Typography/responsiveness depends on #5 + #2 and should run after main pages exist.
+
+Packaging and finish
+- #14 Docker/Fly config after build output is stable.
+- #15 Sample content + README after tag/blog pages are complete (depends on #7).
+
+4) Key Design Decisions
+
+- Use Astro static output with content collections as source of truth for all post metadata.
+- Keep data shaping in reusable helpers (`src/lib/content.ts`) to avoid duplicating sorting/filter/tag logic across pages and RSS.
+- Treat `draft: true` as unpublished everywhere (home, tags, RSS, sitemap-visible pages where applicable).
+- Canonical tag URL convention: `/tags/<normalized-tag>/`; normalize to lowercase + hyphenated form.
+- Dark mode strategy: Tailwind `darkMode: 'class'`, initialize theme class in `<head>` inline script before paint to avoid flash.
+- SEO defaults live in `BaseLayout`; per-page overrides provided through props and `SEO.astro`.
+- Configure `site` once (env-backed `SITE_URL`) and reuse for sitemap, RSS canonical links, and OG absolute URLs.
+- Docker image serves static `dist/` via nginx for minimal runtime surface.
+
+5) Suggested Implementation Order (one issue per session)
+
+#1 -> #2 -> #3 -> #4 -> #5 -> #6 -> #7 -> #8 -> #9 -> #10 -> #11 -> #12 -> #13 -> #14 -> #15
+
+Rationale: establishes framework first, then content model, then core routes, then cross-cutting enhancements, then deployment and docs/content polish.
