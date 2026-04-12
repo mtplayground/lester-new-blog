@@ -1,0 +1,55 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import PostCard from '../../components/PostCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+interface Props {
+  tag: string;
+  posts: CollectionEntry<'blog'>[];
+}
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+  const postsByTag = new Map<string, CollectionEntry<'blog'>[]>();
+
+  for (const post of allPosts) {
+    for (const tag of post.data.tags) {
+      const existingPosts = postsByTag.get(tag) ?? [];
+      existingPosts.push(post);
+      postsByTag.set(tag, existingPosts);
+    }
+  }
+
+  return Array.from(postsByTag.entries()).map(([tag, posts]) => ({
+    params: { tag: encodeURIComponent(tag) },
+    props: {
+      tag,
+      posts: posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime()),
+    },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`#${tag} | Lester Blog`} description={`Posts tagged with ${tag}`}>
+  <section class="space-y-2">
+    <p class="text-sm font-medium text-slate-500">Tag</p>
+    <h1 class="text-3xl font-bold tracking-tight">#{tag}</h1>
+    <p class="text-slate-700">{posts.length} {posts.length === 1 ? 'post' : 'posts'} found.</p>
+  </section>
+
+  <ul class="mt-8 space-y-6">
+    {posts.map((post) => (
+      <li>
+        <PostCard
+          href={`/blog/${post.slug}/`}
+          title={post.data.title}
+          date={post.data.date}
+          excerpt={post.data.description}
+          tags={post.data.tags}
+        />
+      </li>
+    ))}
+  </ul>
+</BaseLayout>
