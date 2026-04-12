@@ -1,5 +1,20 @@
-target/
+# Astro build outputs
 node_modules/
+dist/
+.astro/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+
+# Repository-specific ignores
+target/
 .gh_token
 .claude/
 .database_url
