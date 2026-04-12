@@ -1,0 +1,48 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+
+const tagCounts = posts.reduce((counts, post) => {
+  for (const tag of post.data.tags) {
+    counts.set(tag, (counts.get(tag) ?? 0) + 1);
+  }
+
+  return counts;
+}, new Map<string, number>());
+
+const tags = Array.from(tagCounts.entries())
+  .map(([tag, count]) => ({
+    tag,
+    count,
+    href: `/tags/${encodeURIComponent(tag)}/`,
+  }))
+  .sort((a, b) => a.tag.localeCompare(b.tag));
+---
+
+<BaseLayout title="Tags | Lester Blog" description="Browse posts by tag">
+  <section class="space-y-2">
+    <h1 class="text-3xl font-bold tracking-tight">Tags</h1>
+    <p class="text-slate-700">Browse posts grouped by topic.</p>
+  </section>
+
+  {
+    tags.length === 0 ? (
+      <p class="mt-8 rounded-lg border border-dashed border-slate-300 bg-white p-6 text-slate-600">
+        No tags found yet.
+      </p>
+    ) : (
+      <ul class="mt-8 divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white">
+        {tags.map(({ tag, count, href }) => (
+          <li>
+            <a class="flex items-center justify-between px-5 py-4 transition hover:bg-slate-50" href={href}>
+              <span class="font-medium text-slate-900">#{tag}</span>
+              <span class="text-sm text-slate-500">{count} {count === 1 ? 'post' : 'posts'}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</BaseLayout>
