@@ -6,17 +6,27 @@ const posts = await getCollection('blog', ({ data }) => !data.draft);
 
 const tagCounts = posts.reduce((counts, post) => {
   for (const tag of post.data.tags) {
-    counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    const normalizedTag = tag.trim().toLowerCase();
+    if (!normalizedTag) {
+      continue;
+    }
+
+    const current = counts.get(normalizedTag);
+    if (current) {
+      counts.set(normalizedTag, { ...current, count: current.count + 1 });
+    } else {
+      counts.set(normalizedTag, { label: tag.trim(), count: 1 });
+    }
   }
 
   return counts;
-}, new Map<string, number>());
+}, new Map<string, { label: string; count: number }>());
 
 const tags = Array.from(tagCounts.entries())
-  .map(([tag, count]) => ({
-    tag,
-    count,
-    href: `/tags/${encodeURIComponent(tag)}/`,
+  .map(([normalizedTag, value]) => ({
+    tag: value.label,
+    count: value.count,
+    href: `/tags/${encodeURIComponent(normalizedTag)}/`,
   }))
   .sort((a, b) => a.tag.localeCompare(b.tag));
 ---
