@@ -1,7 +1,7 @@
 ---
 title: "Deploying an Astro Blog on Fly.io"
 date: 2026-04-08
-description: "A quick walkthrough of using a multi-stage Docker build with nginx on Fly.io."
+description: "A practical guide to shipping the static Astro build with Docker and Fly.io."
 tags:
   - deploy
   - docker
@@ -23,3 +23,10 @@ Key points:
 - `SITE_URL` is configured for canonical URLs, RSS, and sitemap generation
 
 This setup keeps runtime images lightweight while preserving a predictable build pipeline.
+
+## Deployment Commands
+
+```bash
+flyctl launch --no-deploy
+flyctl deploy
+```
