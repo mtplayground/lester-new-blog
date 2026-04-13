@@ -1,13 +1,21 @@
 ---
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import SEO from '../components/SEO.astro';
 
 interface Props {
   title?: string;
   description?: string;
+  canonicalUrl?: string;
+  ogImage?: string;
 }
 
-const { title = 'Lester Blog', description = 'A blog built with Astro' } = Astro.props;
+const {
+  title = 'Lester Blog',
+  description = 'A blog built with Astro',
+  canonicalUrl,
+  ogImage,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -15,9 +23,8 @@ const { title = 'Lester Blog', description = 'A blog built with Astro' } = Astro
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
+    <SEO title={title} description={description} canonicalUrl={canonicalUrl} ogImage={ogImage} />
   </head>
   <body class="flex min-h-screen flex-col">
     <Header />
