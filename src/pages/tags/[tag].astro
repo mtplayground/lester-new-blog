@@ -10,26 +10,37 @@ interface Props {
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog', ({ data }) => !data.draft);
-  const postsByTag = new Map<string, CollectionEntry<'blog'>[]>();
+  const postsByTag = new Map<string, { label: string; posts: CollectionEntry<'blog'>[] }>();
 
   for (const post of allPosts) {
     for (const tag of post.data.tags) {
-      const existingPosts = postsByTag.get(tag) ?? [];
-      existingPosts.push(post);
-      postsByTag.set(tag, existingPosts);
+      const normalizedTag = tag.trim().toLowerCase();
+      if (!normalizedTag) {
+        continue;
+      }
+
+      const existing = postsByTag.get(normalizedTag);
+      if (existing) {
+        existing.posts.push(post);
+      } else {
+        postsByTag.set(normalizedTag, {
+          label: tag.trim(),
+          posts: [post],
+        });
+      }
     }
   }
 
-  return Array.from(postsByTag.entries()).map(([tag, posts]) => ({
-    params: { tag: encodeURIComponent(tag) },
+  return Array.from(postsByTag.entries()).map(([normalizedTag, value]) => ({
+    params: { tag: normalizedTag },
     props: {
-      tag,
-      posts: posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime()),
+      tag: value.label,
+      posts: value.posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime()),
     },
   }));
 }
 
-const { tag, posts } = Astro.props;
+const { tag, posts } = Astro.props as Props;
 ---
 
 <BaseLayout title={`#${tag} | Lester Blog`} description={`Posts tagged with ${tag}`}>
