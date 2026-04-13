@@ -4,12 +4,11 @@ primary_region = "iad"
 [build]
   dockerfile = "Dockerfile"
 
+[env]
+  SITE_URL = "https://lester-new-blog.fly.dev"
+
 [http_service]
   internal_port = 8080
   force_https = true
   auto_start = true
   auto_stop = "stop"
-
-[mounts]
-  source = "data"
-  destination = "/app/data"
