@@ -1,20 +1,33 @@
 ---
 title: "Hello World"
 date: 2026-04-13
-description: "First sample post to validate Astro content collections setup."
+description: "Welcome post for the demo blog, showing the content format and writing style."
 tags:
   - intro
   - astro
 draft: false
 ---
 
-This is the sample post used to validate the `blog` content collection.
+Welcome to the demo blog. This post exists as a simple reference for content structure and formatting.
 
-The frontmatter includes all required fields:
+## What This Blog Demonstrates
+
+- Typed content collections in Astro
+- Reusable layouts and components
+- Static pages with SEO, RSS, and sitemap support
+
+## Frontmatter Schema
+
+Each post includes:
+
 - `title`
 - `date`
 - `description`
 - `tags`
 - `draft`
 
-If this file builds successfully, the collection schema is wired correctly.
+## Example Snippet
+
+```ts
+const publishedPosts = posts.filter((post) => !post.data.draft);
+```

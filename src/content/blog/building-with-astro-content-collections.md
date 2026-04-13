@@ -1,7 +1,7 @@
 ---
 title: "Building with Astro Content Collections"
 date: 2026-04-10
-description: "How typed frontmatter and collections make blog features predictable and scalable."
+description: "Why typed collections and validated frontmatter make blog features safer to build."
 tags:
   - astro
   - content
@@ -22,3 +22,12 @@ For this blog, the collection schema defines:
 - `draft`
 
 This structure keeps rendering logic simple and makes future features, such as related posts or advanced filtering, straightforward to implement.
+
+## Practical Benefit
+
+When list pages, tag routes, and RSS generation all rely on the same schema contract, refactors become safer and easier to review.
+
+```ts
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+```

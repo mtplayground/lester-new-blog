@@ -1,11 +1,12 @@
 # Lester New Blog
 
-A production-ready Astro blog starter with:
+A production-ready Astro blog built with typed content collections and static generation.
+
+## Features
 
 - TypeScript and Tailwind CSS
 - Content Collections for typed Markdown posts
 - Dynamic post and tag pages
-- Dark mode with persisted preference
 - SEO metadata, RSS feed, and sitemap generation
 - Docker + Fly.io deployment configuration
 
@@ -22,16 +23,16 @@ A production-ready Astro blog starter with:
 - Node.js 20+
 - npm
 
-### Setup
+### Install Dependencies
 
 ```bash
 npm install
 ```
 
-### Run Dev Server
+### Start Dev Server
 
 ```bash
-npm run dev -- --host 0.0.0.0 --port 8080
+npm run dev
 ```
 
 Open: `http://localhost:8080`
@@ -40,7 +41,7 @@ Open: `http://localhost:8080`
 
 ```bash
 npm run build
-npm run preview -- --host 0.0.0.0 --port 8080
+npm run preview
 ```
 
 ## Content Authoring
@@ -71,6 +72,12 @@ draft: false
 ---
 ```
 
+## Sample Posts Included
+
+- `hello-world.md`
+- `building-with-astro-content-collections.md`
+- `deploying-an-astro-blog-on-fly.md`
+
 ## Generated Routes
 
 - Home: `/`
@@ -92,15 +99,26 @@ This repository includes:
 
 ### Environment Variables
 
-Copy `.env.example` and set values:
+Create your local env file from the example and set values:
 
 - `SITE_URL` (public site URL, e.g. `https://lester-new-blog.fly.dev`)
+
+```bash
+cp .env.example .env
+```
 
 ### Deploy
 
 ```bash
 flyctl launch --no-deploy
 flyctl deploy
+```
+
+## Docker Build (Optional)
+
+```bash
+docker build -t lester-new-blog .
+docker run --rm -p 8080:8080 lester-new-blog
 ```
 
 ## License
