@@ -1,4 +1,3 @@
-# Self-check: cargo build --release on host is not applicable (Node/Astro project, no Cargo.toml); using Node multi-stage production image.
 FROM node:20-bookworm-slim AS build
 WORKDIR /app
 
